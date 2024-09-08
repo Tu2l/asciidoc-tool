@@ -1,0 +1,21 @@
+.gridContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-gap: 20px;
+  height: 100vh;
+  margin-top: 20px;
+  @media screen and (max-width: 768px) {
+    height: 400px;
+  }
+}
+
+.gridItemsecond{
+  /* Optional styling for grid items */
+  border: 1px solid #000;
+}
+
+.largeTextArea {
+  width: 100%;
+  height: 100%;
+  resize: none;
+}
