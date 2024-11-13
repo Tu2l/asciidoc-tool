@@ -3,7 +3,7 @@
 import React from 'react';
 import Asciidoctor from 'asciidoctor';
 import dynamic from 'next/dynamic'
-import { Button, Typography } from '@mui/material';
+import Toolbar from './Toolbar';
 
 const Split = dynamic(() => import('react-split'), { ssr: false })
 const styles = {
@@ -11,19 +11,6 @@ const styles = {
     height: '100vh',
     display: 'flex',
     flexDirection: 'column',
-  },
-  header: {
-    backgroundColor: '#2d3748',
-    color: 'white',
-    padding: '1rem',
-  },
-  headerTitle: {
-    fontSize: '1.5rem',
-    fontWeight: 'bold',
-    margin: 0,
-  },
-  headerConvertButton: {
-    float: 'right'
   },
   splitContainer: {
     flex: 1,
@@ -53,9 +40,40 @@ const styles = {
 
 const converter = Asciidoctor()
 
+// save adoc file
+function saveADocFile(adocFile, fileName = "file") {
+  const element = document.createElement('a')
+  const file = new Blob([adocFile], { type: 'text' })
+  element.href = URL.createObjectURL(file)
+  element.download = fileName + ".adoc"
+  document.body.appendChild(element)
+  element.click()
+  document.body.removeChild(element)
+}
+
+// export html page
+function exportHTML(htmlContent, name = "exported_html") {
+  const element = document.createElement('a')
+  const file = new Blob([htmlContent], { type: 'text/html' })
+  element.href = URL.createObjectURL(file)
+  element.download = name + ".html"
+  document.body.appendChild(element)
+  element.click()
+  document.body.removeChild(element)
+}
+
+// export pdf
+function exportToPDF(htmlContent) {
+  const originalContents = document.body.innerHTML
+  document.body.innerHTML = htmlContent
+  window.print()
+  document.body.innerHTML = originalContents
+}
+
 function AsciiDocConverter() {
   const [asciidocText, setAsciidocText] = React.useState('')
   const [htmlOutput, setHtmlOutput] = React.useState('')
+  const [fileName, setFileName] = React.useState('file')
 
   const handleAsciidocChange = (event) => {
     setAsciidocText(event.target.value);
@@ -96,21 +114,33 @@ function AsciiDocConverter() {
     }
   }, [])
 
+  const handleExportHtml = () => {
+    exportHTML(htmlOutput, fileName)
+  }
+
+  const handleExportPdf = () => {
+    exportToPDF(htmlOutput)
+  }
+
+  const handleSaveAdocFile = () => {
+    saveADocFile(asciidocText, fileName)
+  }
+
+  const buttonData = [
+    { label: 'Convert', onClick: handleConvertClick, disable: !asciidocText },
+    { label: 'Export HTML', onClick: handleExportHtml, disable: !htmlOutput },
+    { label: 'Print as PDF', onClick: handleExportPdf, disable: !htmlOutput },
+    { label: 'Save .adoc', onClick: handleSaveAdocFile, disable: !asciidocText },
+  ];
+
   return (
     <div style={styles.container}>
-      <header style={styles.header}>
-        <Typography
-          style={styles.headerTitle}>
-          AsciiDoc Live Editor
-          <Button
-            style={styles.headerConvertButton}
-            variant='contained'
-            onClick={handleConvertClick}
-            disabled={!asciidocText}>
-            Convert
-          </Button>
-        </Typography>
-      </header>
+      <Toolbar
+        items={buttonData}
+        handleFileNameChange={setFileName}
+        fileName={fileName}
+      />
+
       <Split
         style={styles.splitContainer}
         sizes={[50, 50]}
@@ -137,7 +167,7 @@ function AsciiDocConverter() {
           />
         </div>
         <div style={styles.previewPane}>
-          <div dangerouslySetInnerHTML={{ __html: htmlOutput }} />
+          <div id={'asciidoc_output'} dangerouslySetInnerHTML={{ __html: htmlOutput }} />
         </div>
       </Split>
     </div>
