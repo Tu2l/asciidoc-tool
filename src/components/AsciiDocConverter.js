@@ -2,8 +2,8 @@
 
 import React from 'react';
 import Asciidoctor from 'asciidoctor';
-// import styles from "./AsciiDocConverter.module.css";
 import dynamic from 'next/dynamic'
+import { Button, Typography } from '@mui/material';
 
 const Split = dynamic(() => import('react-split'), { ssr: false })
 const styles = {
@@ -22,6 +22,9 @@ const styles = {
     fontWeight: 'bold',
     margin: 0,
   },
+  headerConvertButton: {
+    float: 'right'
+  },
   splitContainer: {
     flex: 1,
     display: 'flex',
@@ -38,6 +41,7 @@ const styles = {
     resize: 'none',
     fontFamily: 'monospace',
     outline: 'none',
+    backgroundColor: '#cacaca'
   },
   previewPane: {
     overflow: 'auto',
@@ -47,19 +51,20 @@ const styles = {
   },
 }
 
+const converter = Asciidoctor()
+
 function AsciiDocConverter() {
-  const [asciidocText, setAsciidocText] = React.useState('');
-  const [htmlOutput, setHtmlOutput] = React.useState('');
+  const [asciidocText, setAsciidocText] = React.useState('')
+  const [htmlOutput, setHtmlOutput] = React.useState('')
 
   const handleAsciidocChange = (event) => {
     setAsciidocText(event.target.value);
   };
 
   const handleConvertClick = () => {
-    const converter = Asciidoctor();
-    const html = converter.convert(asciidocText, { to_file: false, standalone: true, safe: 'safe' });
+    const html = converter.convert(asciidocText, { to_file: false, standalone: true, safe: 'safe' })
     setHtmlOutput(html);
-    localStorage.setItem('asciidoctext', asciidocText);
+    localStorage.setItem('asciidoctext', asciidocText)
   };
 
   React.useEffect(() => {
@@ -94,8 +99,17 @@ function AsciiDocConverter() {
   return (
     <div style={styles.container}>
       <header style={styles.header}>
-        <h1 style={styles.headerTitle}>ASCII Doc Live Editor</h1>
-        <button onClick={handleConvertClick}>Convert</button>
+        <Typography
+          style={styles.headerTitle}>
+          AsciiDoc Live Editor
+          <Button
+            style={styles.headerConvertButton}
+            variant='contained'
+            onClick={handleConvertClick}
+            disabled={!asciidocText}>
+            Convert
+          </Button>
+        </Typography>
       </header>
       <Split
         style={styles.splitContainer}

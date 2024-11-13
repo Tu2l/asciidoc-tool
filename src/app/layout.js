@@ -4,8 +4,8 @@ import { Inter } from "next/font/google";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "ASCIIDOC converter",
-  description: "D&D by Tu2l",
+  title: "AsciiDoc tool",
+  description: "AsciiDoc live preview editor by Tu2l",
 };
 
 export default function RootLayout({ children }) {
