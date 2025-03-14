@@ -1,9 +1,17 @@
 'use client'
 
-import React from 'react';
-import Asciidoctor from 'asciidoctor';
+import React from 'react'
+import Asciidoctor from 'asciidoctor'
 import dynamic from 'next/dynamic'
-import Toolbar from './Toolbar';
+import TopBar from './TopBar'
+import asciidoctorcss from '../../public/css/asciidoctor.css'
+import { Box, TextareaAutosize } from '@mui/material'
+import {
+  Refresh as RefreshIcon,
+  Html as HtmlIcon,
+  PictureAsPdf as PictureAsPdfIcon,
+  Save as SaveIcon
+} from '@mui/icons-material'
 
 const Split = dynamic(() => import('react-split'), { ssr: false })
 const styles = {
@@ -26,9 +34,9 @@ const styles = {
     padding: '1rem',
     border: 'none',
     resize: 'none',
-    fontFamily: 'monospace',
+    fontFamily: 'Roboto Mono, monospace',
+    fontSize: '16px',
     outline: 'none',
-    backgroundColor: '#cacaca'
   },
   previewPane: {
     overflow: 'auto',
@@ -76,14 +84,14 @@ function AsciiDocConverter() {
   const [fileName, setFileName] = React.useState('file')
 
   const handleAsciidocChange = (event) => {
-    setAsciidocText(event.target.value);
-  };
+    setAsciidocText(event.target.value)
+  }
 
   const handleConvertClick = () => {
     const html = converter.convert(asciidocText, { to_file: false, standalone: true, safe: 'safe' })
-    setHtmlOutput(html);
+    setHtmlOutput(html)
     localStorage.setItem('asciidoctext', asciidocText)
-  };
+  }
 
   React.useEffect(() => {
     const savedAsciidoctext = localStorage.getItem('asciidoctext')
@@ -127,15 +135,15 @@ function AsciiDocConverter() {
   }
 
   const buttonData = [
-    { label: 'Convert', onClick: handleConvertClick, disable: !asciidocText },
-    { label: 'Export HTML', onClick: handleExportHtml, disable: !htmlOutput },
-    { label: 'Print as PDF', onClick: handleExportPdf, disable: !htmlOutput },
-    { label: 'Save .adoc', onClick: handleSaveAdocFile, disable: !asciidocText },
+    { label: 'Convert', onClick: handleConvertClick, disable: !asciidocText, icon: <RefreshIcon /> },
+    { label: 'Export', onClick: handleExportHtml, disable: !htmlOutput, icon: <HtmlIcon /> },
+    { label: 'Print', onClick: handleExportPdf, disable: !htmlOutput, icon: <PictureAsPdfIcon /> },
+    { label: '.adoc', onClick: handleSaveAdocFile, disable: !asciidocText, icon: <SaveIcon /> },
   ];
 
   return (
-    <div style={styles.container}>
-      <Toolbar
+    <Box sx={styles.container}>
+      <TopBar
         items={buttonData}
         handleFileNameChange={setFileName}
         fileName={fileName}
@@ -158,20 +166,20 @@ function AsciiDocConverter() {
           return gutter
         }}
       >
-        <div style={styles.editorPane}>
-          <textarea
+        <Box style={styles.editorPane}>
+          <TextareaAutosize
             style={styles.editor}
             value={asciidocText}
             onChange={handleAsciidocChange}
             placeholder="Type your ASCII Doc here..."
           />
-        </div>
-        <div style={styles.previewPane}>
+        </Box>
+        <Box style={styles.previewPane}>
           <div id={'asciidoc_output'} dangerouslySetInnerHTML={{ __html: htmlOutput }} />
-        </div>
+        </Box>
       </Split>
-    </div>
-  );
+    </Box>
+  )
 }
 
-export default AsciiDocConverter;
+export default AsciiDocConverter
